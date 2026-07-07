@@ -236,7 +236,8 @@
 
         /* --- MEMORY CELLS PAGE --- */
         .cells-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .search-box { position: relative; width: 280px; }
+        .cells-header-right { display: flex; align-items: center; gap: 12px; }
+        .search-box { position: relative; width: 240px; }
         .search-box input {
             width: 100%; padding: 10px 16px 10px 40px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.1);
             outline: none; background: rgba(255, 255, 255, 0.7); font-size: 14px; transition: all 0.3s ease;
@@ -244,6 +245,15 @@
         .search-box input:focus { background: var(--white); border-color: var(--brand-main); }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
         
+        .btn-edit-mode {
+            background: #fff; border: 1px solid var(--brand-main); color: var(--brand-main);
+            padding: 9px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
+            transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
+        }
+        .btn-edit-mode:hover { background: rgba(126, 108, 249, 0.08); }
+        .btn-edit-mode.active { background: #e63946; border-color: #e63946; color: white; }
+        .btn-edit-mode.active:hover { background: #c92a3a; }
+
         .petri-dish {
             width: 100%; height: 550px; background: rgba(167, 231, 215, 0.15);
             border-radius: 24px; border: 1px solid rgba(167, 231, 215, 0.3);
@@ -255,7 +265,7 @@
             display: flex; justify-content: center; align-items: center;
             color: #222; font-size: 12px; font-weight: 700;
             box-shadow: inset -4px -4px 12px rgba(0,0,0,0.05), 0 8px 20px rgba(0,0,0,0.05);
-            transition: filter 0.3s ease, opacity 0.3s ease;
+            transition: filter 0.3s ease, opacity 0.3s ease, border-color 0.2s;
             user-select: none; z-index: 5;
         }
         .memory-cell-node:hover {
@@ -264,6 +274,16 @@
         }
         .memory-cell-node.blur-out { opacity: 0.2; filter: blur(2px); }
         .memory-cell-node.highlight-in { opacity: 1; filter: blur(0); border: 2px solid var(--brand-main); }
+        
+        /* 세포 삭제 버튼 디자인 스타일 */
+        .cell-delete-btn {
+            position: absolute; top: -2px; right: -2px; width: 22px; height: 22px;
+            background: #e63946; color: white; border-radius: 50%; display: none;
+            justify-content: center; align-items: center; font-size: 11px; font-weight: 800;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 1.5px solid white; cursor: pointer; z-index: 60;
+        }
+        .cell-delete-btn:hover { background: #c92a3a; transform: scale(1.1); }
+        
         .no-memories-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: #778; font-weight: 600; display: none; }
 
         /* --- CALENDAR PAGE --- */
@@ -331,7 +351,7 @@
         .auth-modal-btns { display: flex; flex-direction: column; gap: 10px; }
         .btn-guest { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; padding: 10px; border-radius: 20px; font-weight: 600; cursor: pointer; }
 
-        /* --- FOOTER STYLE (새로 추가됨) --- */
+        /* --- FOOTER STYLE --- */
         footer {
             width: 100%;
             padding: 20px 0 30px 0;
@@ -398,7 +418,7 @@
                     <textarea id="memory-input" maxlength="300" placeholder="이곳에 기록된 당신의 경험은 세포가 되어 영원히 보관됩니다. (최대 300자)"></textarea>
                     <div class="char-counter"><span id="char-count">0</span> / 300</div>
                 </div>
-                <div class="write-actions"><button class="btn-primary" onclick="saveMemory()">기억 저장하기 <i class="fa-solid fa-cloud-arrow-up"></i></button></div>
+                <div class="write-actions"><button class="btn-primary" onclick="saveMemory()">기억 저장하기 <i class="fa-cloud-arrow-up fa-solid"></i></button></div>
             </div>
         </section>
 
@@ -406,9 +426,12 @@
             <div class="glass-card">
                 <div class="cells-header">
                     <h2>Memory Cells <span id="cells-user-badge" style="font-size:16px; color:#667085; font-weight:500;"></span></h2>
-                    <div class="search-box">
-                        <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="cell-search" placeholder="날짜 또는 내용 검색..." oninput="searchCells()">
+                    <div class="cells-header-right">
+                        <button id="btn-edit-toggle" class="btn-edit-mode" onclick="toggleEditMode()"><i class="fa-solid fa-pen"></i> 편집하기</button>
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="cell-search" placeholder="날짜 또는 내용 검색..." oninput="searchCells()">
+                        </div>
                     </div>
                 </div>
                 <div class="petri-dish" id="petri-dish">
@@ -458,13 +481,14 @@
                     <div class="profile-footer-text">"Every memory builds tomorrow."</div>
                 </div>
             </div>
-        </main>
+        </section>
+    </main>
 
-        <footer>
-            <div class="footer-content">
-                Chungnam Arts High School - Design Major | Created by Somi Kwon
-            </div>
-        </footer>
+    <footer>
+        <div class="footer-content">
+            Chungnam Arts High School - Design Major | Created by Somi Kwon
+        </div>
+    </footer>
 
     <div class="modal-overlay" id="detail-modal">
         <div class="modal-content">
@@ -489,7 +513,6 @@
     <div class="toast" id="toast-alert">오늘의 기억이 저장되었습니다.</div>
 
     <script>
-        // 로그인 세션 상태 세분화 (null: 로그아웃 상태, 'guest': 비회원, 'ID문자열': 회원계정)
         let currentUser = localStorage.getItem('memotive_current_user') || null;
         let memories = [];
         let targetGoal = 20;
@@ -498,6 +521,7 @@
         let currentMonth = 6; 
         let cellNodesData = [];
         let petriAnimationId = null;
+        let isEditMode = false; // 편집 모드 활성화 유무 플래그
 
         document.addEventListener('DOMContentLoaded', () => {
             initCharCounter();
@@ -541,10 +565,13 @@
             if (currentUser) {
                 currentUser = null;
                 localStorage.removeItem('memotive_current_user');
-                loadUserData();
+                memories = [];
+                cellNodesData = [];
+                isEditMode = false;
                 updateAuthUI();
                 showToast('로그아웃 되었습니다. 저장소가 잠깁니다.');
                 navigateTo('home');
+                setTimeout(() => { window.location.reload(); }, 300);
             } else {
                 document.getElementById('auth-username-input').value = '';
                 document.getElementById('auth-modal').classList.add('show');
@@ -603,6 +630,16 @@
                 return;
             }
 
+            // 페이지 이탈 시 편집 모드 초기화 강제 해제
+            if (isEditMode) {
+                isEditMode = false;
+                const btn = document.getElementById('btn-edit-toggle');
+                if(btn) {
+                    btn.classList.remove('active');
+                    btn.innerHTML = '<i class="fa-solid fa-pen"></i> 편집하기';
+                }
+            }
+
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.querySelectorAll('nav a').forEach(nav => nav.classList.remove('active'));
             
@@ -625,7 +662,7 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        function initCharCounter() {
+        initCharCounter = () => {
             const textarea = document.getElementById('memory-input');
             const counter = document.getElementById('char-count');
             textarea.addEventListener('input', () => { counter.innerText = textarea.value.length; });
@@ -652,14 +689,79 @@
             setTimeout(() => navigateTo('cells'), 800);
         }
 
+        // --- EDIT MODE TOGGLE FUNCTION (기억세포 정지 및 삭제 토글 로직) ---
+        function toggleEditMode() {
+            if (!currentUser || memories.length === 0) return;
+            
+            isEditMode = !isEditMode;
+            const btn = document.getElementById('btn-edit-toggle');
+            const deleteButtons = document.querySelectorAll('.cell-delete-btn');
+
+            if (isEditMode) {
+                // 편집 모드 켜짐 -> 애니메이션 멈춤 및 X 노출
+                cancelAnimationFrame(petriAnimationId);
+                btn.classList.add('active');
+                btn.innerHTML = '<i class="fa-solid fa-check"></i> 완료하기';
+                deleteButtons.forEach(b => b.style.display = 'flex');
+                
+                // 편집 시에는 검색창 무력화
+                document.getElementById('cell-search').value = '';
+                searchCells();
+            } else {
+                // 편집 모드 꺼짐 -> 애니메이션 다시 기동 및 X 숨김
+                btn.classList.remove('active');
+                btn.innerHTML = '<i class="fa-solid fa-pen"></i> 편집하기';
+                deleteButtons.forEach(b => b.style.display = 'none');
+                animatePetriDish();
+            }
+        }
+
+        // 특정 세포 삭제 실행 함수
+        function deleteCell(id, event) {
+            event.stopPropagation(); // 세포 클릭 이벤트(상세 모달 팝업) 방지
+            
+            if (confirm('이 기억세포를 정말로 소멸시키겠습니까? 되돌릴 수 없습니다.')) {
+                // 1. 메모리 배열에서 삭제 대상 ID 필터링
+                memories = memories.filter(m => m.id !== id);
+                
+                // 2. 계정별 로컬 저장소 최신화
+                localStorage.setItem(`memories_${currentUser}`, JSON.stringify(memories));
+                
+                showToast('기억세포가 소멸되었습니다.');
+                
+                // 3. 편집 상태 유지하며 페트리접시 화면 재구성
+                const currentEditState = isEditMode;
+                renderMemoryCells();
+                
+                if (currentEditState && memories.length > 0) {
+                    isEditMode = true;
+                    cancelAnimationFrame(petriAnimationId);
+                    const btn = document.getElementById('btn-edit-toggle');
+                    btn.classList.add('active');
+                    btn.innerHTML = '<i class="fa-solid fa-check"></i> 완료하기';
+                    document.querySelectorAll('.cell-delete-btn').forEach(b => b.style.display = 'flex');
+                } else {
+                    isEditMode = false;
+                }
+            }
+        }
+
         function renderMemoryCells() {
             const dish = document.getElementById('petri-dish');
             const msg = document.getElementById('no-memories-msg');
             dish.innerHTML = '';
             dish.appendChild(msg);
 
-            if (!currentUser || memories.length === 0) { msg.style.display = 'block'; return; } 
-            else { msg.style.display = 'none'; }
+            // 편집하기 버튼 상태 제어
+            const editToggleBtn = document.getElementById('btn-edit-toggle');
+            if (!currentUser || memories.length === 0) {
+                msg.style.display = 'block';
+                if(editToggleBtn) editToggleBtn.style.display = 'none';
+                return;
+            } else {
+                msg.style.display = 'none';
+                if(editToggleBtn) editToggleBtn.style.display = 'flex';
+            }
 
             cellNodesData = [];
             const colors = ['rgba(126, 108, 249, 0.65)', 'rgba(185, 167, 255, 0.7)', 'rgba(167, 231, 215, 0.75)', 'rgba(205, 232, 255, 0.8)'];
@@ -684,7 +786,15 @@
                 node.style.left = `${x}px`;
                 node.style.top = `${y}px`;
 
+                // 개별 세포 삭제 전용 엘리먼트 동적 탑재
+                const delBtn = document.createElement('div');
+                delBtn.className = 'cell-delete-btn';
+                delBtn.innerHTML = '&times;';
+                delBtn.onclick = (e) => deleteCell(mem.id, e);
+                node.appendChild(delBtn);
+
                 node.addEventListener('click', (e) => {
+                    if (isEditMode) return; // 편집 상태에서는 상세 모달창 열기를 방어
                     e.stopPropagation(); 
                     openModal(mem);
                 });
@@ -703,10 +813,13 @@
             });
 
             cancelAnimationFrame(petriAnimationId);
-            animatePetriDish();
+            if (!isEditMode) {
+                animatePetriDish();
+            }
         }
 
         function animatePetriDish() {
+            if (isEditMode) return; // 편집 상태일 경우 움직임 캔슬
             const dish = document.getElementById('petri-dish');
             if(!dish) return;
             const W = dish.clientWidth;
@@ -732,6 +845,7 @@
         }
 
         function searchCells() {
+            if (isEditMode) return; // 편집모드일 때는 검색 중단
             const query = document.getElementById('cell-search').value.toLowerCase().trim();
             const msg = document.getElementById('no-memories-msg');
             let hasResult = false;
@@ -872,7 +986,6 @@
             document.getElementById('detail-modal').classList.remove('show');
         }
 
-        // 앰비언트 백그라운드 세포 생성 함수
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
