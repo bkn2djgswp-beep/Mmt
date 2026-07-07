@@ -37,6 +37,7 @@
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
+            position: relative;
         }
 
         /* --- NAVIGATION --- */
@@ -119,6 +120,7 @@
             justify-content: center;
             align-items: flex-start;
             position: relative;
+            z-index: 10;
         }
 
         .page {
@@ -179,7 +181,7 @@
         /* --- HOME PAGE --- */
         #page-home { text-align: center; padding-top: 20px; width: 100%; position: relative; }
         .home-container {
-            display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; pointer-events: none;
+            display: flex; flex-direction: column; align-items: center; position: relative; z-index: 20; pointer-events: none;
         }
         .slogan, .main-title, .intro-text { user-select: none; }
         .moti-container, .btn-primary, .feed-guide-text { pointer-events: auto; }
@@ -198,7 +200,7 @@
         }
         
         /* 메인 캐릭터 영역 */
-        .moti-container { position: relative; width: 220px; height: 220px; margin-bottom: 30px; z-index: 20; }
+        .moti-container { position: relative; width: 220px; height: 220px; margin-bottom: 30px; z-index: 30; }
         .moti {
             width: 100%; height: 100%;
             background: radial-gradient(circle at 35% 35%, #E6E1FF 0%, var(--brand-sub) 60%, var(--brand-main) 100%);
@@ -226,29 +228,27 @@
         .moti-blush.left { left: -6px; }
         .moti-blush.right { right: -6px; }
 
-        /* 배경 인터랙티브 셀 레이어 */
+        /* ⭐️ [핵심 변경] 배경 인터랙티브 셀 레이어 최상위 화면 배치 설정 */
         .ambient-cells { 
-            position: absolute; 
+            position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
-            min-height: calc(100vh - 150px);
-            z-index: 5; 
-            pointer-events: auto; 
+            z-index: 2; 
+            pointer-events: none;
+            display: none; /* 기본 숨김 후 홈화면에서만 노출 */
         }
 
-        /* ⭐️ [방법 구현 핵심] 확실히 보이도록 불투명도 향상, 흰색 굵은 외곽선 및 네온 빛 테두리 추가 */
+        /* 배경 밥 세포 스타일 (투명도 40% 체감 보정 완료 및 네온 이펙트 강화) */
         .bg-cell { 
             position: absolute; 
             border-radius: 50%; 
-            opacity: 0.55; /* 확실히 인식되도록 40%에서 55%로 보정 업그레이드 */
+            opacity: 0.55; 
             backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
-            border: 2.5px solid #ffffff; /* 흰색 테두리를 더 굵게 지정해 형태를 확실히 마킹 */
+            border: 2.5px solid #ffffff; 
             cursor: grab;
             pointer-events: auto;
-            /* 셀 고유 색상에 맞춘 발광(Glow) 효과를 주어 배경에서 무조건 보정 분리함 */
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 8px rgba(255, 255, 255, 0.6); 
             display: flex; justify-content: center; align-items: center;
             user-select: none;
-            z-index: 6;
+            z-index: 5;
             touch-action: none;
             transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
         }
@@ -319,15 +319,6 @@
         .memory-cell-node:hover { filter: brightness(1.1); z-index: 50; }
         .memory-cell-node.blur-out { opacity: 0.2; filter: blur(2px); }
         .memory-cell-node.highlight-in { opacity: 1; filter: blur(0); border: 2px solid var(--brand-main); }
-        
-        .cell-delete-btn {
-            position: absolute; top: -2px; right: -2px; width: 22px; height: 22px;
-            background: #e63946; color: white; border-radius: 50%; display: none;
-            justify-content: center; align-items: center; font-size: 11px; font-weight: 800;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 1.5px solid white; cursor: pointer; z-index: 60;
-        }
-        .cell-delete-btn:hover { background: #c92a3a; transform: scale(1.1); }
-        .no-memories-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: #778; font-weight: 600; display: none; }
 
         /* --- CALENDAR PAGE --- */
         .calendar-container { max-width: 700px; margin: 0 auto; position: relative; z-index: 10; }
@@ -345,7 +336,6 @@
         .day-cell.today .day-num { color: #1abc9c; font-weight: 800; }
         .cell-icons { display: flex; gap: 2px; flex-wrap: wrap; width: 100%; }
         .cell-moti-dot { width: 14px; height: 14px; background: var(--brand-sub); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
-        .cell-moti-count { background: var(--brand-main); color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; font-weight: 700; }
 
         /* --- PROFILE PAGE --- */
         .profile-layout { position: relative; z-index: 10; width: 100%; }
@@ -362,7 +352,6 @@
         .chart-box { position: relative; width: 160px; height: 160px; margin-bottom: 15px; }
         .chart-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 800; color: var(--brand-main); }
         .profile-footer-text { grid-column: span 2; text-align: center; font-size: 15px; font-weight: 600; color: #778; margin-top: 20px; }
-        @media (max-width: 768px) { .profile-footer-text { grid-column: span 1; } }
 
         /* --- POPUP MODAL --- */
         .modal-overlay {
@@ -388,23 +377,20 @@
         .modal-date { font-size: 14px; color: var(--brand-main); font-weight: 700; margin-bottom: 14px; }
         .modal-body { font-size: 16px; line-height: 1.7; color: #444; white-space: pre-wrap; word-break: break-all; }
 
-        /* Custom Auth Prompt Modal */
+        /* Auth Prompt Modal */
         .auth-modal-content { text-align: center; }
         .auth-modal-content h3 { margin-bottom: 15px; font-size: 20px; }
         .auth-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 15px; outline: none; text-align: center; }
         .auth-modal-btns { display: flex; flex-direction: column; gap: 10px; }
         .btn-guest { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; padding: 10px; border-radius: 20px; font-weight: 600; cursor: pointer; }
 
-        /* --- FOOTER STYLE --- */
         footer { width: 100%; padding: 20px 0 30px 0; text-align: center; background: transparent; z-index: 10; }
         .footer-content { font-size: 13px; color: #888ea8; font-weight: 500; letter-spacing: 0.5px; opacity: 0.8; }
 
-        /* --- KEYFRAMES ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(185, 167, 255, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(185, 167, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(185, 167, 255, 0); } }
         @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
-        
         @keyframes spreadBlast {
             0% { transform: scale(1); border-radius: 50%; }
             25% { transform: scale(1.4, 0.65); border-radius: 38% 62% 35% 65% / 45% 45% 55% 55%; }
@@ -412,7 +398,6 @@
             75% { transform: scale(1.15, 0.85); border-radius: 48% 52% 43% 57% / 52% 48% 52% 48%; }
             100% { transform: scale(1); border-radius: 50%; }
         }
-        
         @keyframes eatBump {
             0% { transform: scale(1); }
             35% { transform: scale(1.3); box-shadow: 0 25px 50px rgba(167, 231, 215, 0.6); }
@@ -422,6 +407,8 @@
     </style>
 </head>
 <body>
+
+    <div class="ambient-cells" id="ambient-cells-container"></div>
 
     <header>
         <div class="logo" onclick="navigateTo('home')"><span class="logo-dot"></span>Memotive</div>
@@ -461,8 +448,6 @@
                 
                 <p class="feed-guide-text"><i class="fa-solid fa-hand-pointer"></i> 캐릭터를 꾹 누르거나, 배경의 세포를 드래그해서 먹여보세요!</p>
             </div>
-            
-            <div class="ambient-cells" id="ambient-cells-container"></div>
         </section>
 
         <section id="page-write" class="page">
@@ -481,7 +466,6 @@
                 <div class="cells-header">
                     <h2>Memory Cells <span id="cells-user-badge" style="font-size:16px; color:#667085; font-weight:500;"></span></h2>
                     <div class="cells-header-right">
-                        <button id="btn-edit-toggle" class="btn-edit-mode" onclick="toggleEditMode()"><i class="fa-solid fa-pen"></i> 편집하기</button>
                         <div class="search-box">
                             <i class="fa-solid fa-magnifying-glass"></i>
                             <input type="text" id="cell-search" placeholder="날짜 또는 내용 검색..." oninput="searchCells()">
@@ -512,8 +496,6 @@
                     <div class="stats-list">
                         <div class="stat-item"><span class="stat-label">이번 달 총 기록 수</span><span class="stat-value" id="stat-month-count">0개</span></div>
                         <div class="stat-item"><span class="stat-label">생성된 총 기억세포 수</span><span class="stat-value" id="stat-total-cells">0개</span></div>
-                        <div class="stat-item"><span class="stat-label">연속 기록 일수</span><span class="stat-value" id="stat-streak">0일</span></div>
-                        <div class="stat-item"><span class="stat-label">가장 자주 기록한 요일</span><span class="stat-value" id="stat-top-day">-</span></div>
                     </div>
                     <div class="chart-container">
                         <h4 style="margin-bottom: 15px; color:#555;">이달의 목표 달성률</h4>
@@ -530,9 +512,7 @@
                             <div class="chart-text" id="chart-percentage">0%</div>
                         </div>
                         <p style="font-size: 14px; color:#777;">목표 기준 : 한 달 <span id="target-goal-text">20</span>일 기록</p>
-                        <button class="btn-sm" onclick="editTargetGoal()">목표 수정</button>
                     </div>
-                    <div class="profile-footer-text">"Every memory builds tomorrow."</div>
                 </div>
             </div>
         </section>
@@ -574,16 +554,15 @@
         let currentMonth = 6; 
         let cellNodesData = [];
         let petriAnimationId = null;
-        let isEditMode = false;
 
         let motiPressTimer = null;
         let isLongPressed = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             initCharCounter();
-            createAmbientCells(); 
             loadUserData(); 
             updateAuthUI();
+            createAmbientCells(); 
 
             document.getElementById('detail-modal').addEventListener('click', function(e) { if(e.target === this) closeModal(); });
             document.getElementById('auth-modal').addEventListener('click', function(e) { if(e.target === this) closeAuthModal(); });
@@ -600,7 +579,6 @@
                 moti.classList.remove('eat-effect');
                 moti.classList.add('spread-effect');
                 showToast('🧪 세포 자극! 캐릭터가 유연하게 사방으로 퍼집니다.');
-                
                 setTimeout(() => { moti.classList.remove('spread-effect'); }, 600);
             }, 600);
         }
@@ -611,13 +589,22 @@
             if(moti) { moti.style.transform = ""; }
         }
 
-        // 2. 배경 세포 생성 스크립트 수정 및 예외 문자열 전면 디버깅 완료
+        // 배경 세포 생성 스크립트 보정 및 영역 확보
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
             container.innerHTML = ''; 
-            const maxCells = 10;
+            
+            // 홈 화면 상태일 때만 활성화하여 가독성 인터럽트 제어
+            const activePage = document.querySelector('.page.active');
+            if (activePage && activePage.id === 'page-home') {
+                container.style.display = 'block';
+            } else {
+                container.style.display = 'none';
+                return;
+            }
 
+            const maxCells = 12;
             for(let i=0; i<maxCells; i++) {
                 makeSingleFeedCell(container);
             }
@@ -627,27 +614,19 @@
             const cell = document.createElement('div');
             cell.className = 'bg-cell';
             
-            const size = Math.random() * 25 + 32; 
+            const size = Math.random() * 20 + 35; 
             cell.style.width = size + 'px';
             cell.style.height = size + 'px';
             
-            cell.style.left = (Math.random() * 80 + 10) + '%';
-            cell.style.top = (Math.random() * 60 + 15) + '%';
+            // 메인 캐릭터 배치 주변부 레이아웃 유동 연산 배치
+            cell.style.left = (Math.random() * 84 + 8) + '%';
+            cell.style.top = (Math.random() * 65 + 15) + '%';
             cell.innerHTML = "✨";
             cell.style.fontSize = (size * 0.45) + "px";
 
-            // ⭐️ [방법 구현 구현부] 파스텔 불투명 배경에 묻히지 않도록 선명한 솔리드(Solid) 계열 컬러세트로 전환
-            const colorPalettes = [
-                '#34e7e4', /* 리얼 민트 청록 */
-                '#00d2d3', /* 네온 민트 */
-                '#54a0ff', /* 비비드 스카이 블루 */
-                '#2e86de', /* 선명한 푸른색 */
-                '#48dbfb'  /* 맑은 하늘색 */
-            ];
+            const colorPalettes = ['#34e7e4', '#00d2d3', '#54a0ff', '#2e86de', '#48dbfb'];
             const chosenColor = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
             cell.style.backgroundColor = chosenColor;
-            
-            // 박스 섀도우에도 고유 색상 glow를 직접 입혀 시각 인지성 폭발 향상
             cell.style.boxShadow = `0 4px 10px rgba(0,0,0,0.1), 0 0 10px ${chosenColor}`;
 
             let isDragging = false;
@@ -655,7 +634,7 @@
 
             const onDragStart = (e) => {
                 isDragging = true;
-                cell.style.transform = 'scale(1.22)';
+                cell.style.transform = 'scale(1.25)';
                 cell.style.opacity = '1.0';
                 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
@@ -669,16 +648,11 @@
 
             const onDragMove = (e) => {
                 if (!isDragging) return;
-                
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 
-                const containerRect = parentContainer.getBoundingClientRect();
-                let newX = clientX - containerRect.left - startX;
-                let newY = clientY - containerRect.top - startY;
-                
-                cell.style.left = newX + 'px';
-                cell.style.top = newY + 'px';
+                cell.style.left = (clientX - startX) + 'px';
+                cell.style.top = (clientY - startY) + 'px';
 
                 checkMotiMouthOpen(cell);
             };
@@ -687,12 +661,12 @@
                 if (!isDragging) return;
                 isDragging = false;
                 cell.style.transform = '';
-                cell.style.opacity = ''; // CSS의 기본 불투명도 스케일(0.55)로 복원됨
+                cell.style.opacity = ''; 
 
                 if (checkEatSuccess(cell)) {
                     triggerMotiEatEffect();
                     cell.remove(); 
-                    setTimeout(() => { makeSingleFeedCell(parentContainer); }, 2500);
+                    setTimeout(() => { makeSingleFeedCell(parentContainer); }, 2000);
                 } else {
                     document.getElementById('main-moti').classList.remove('eating');
                 }
@@ -716,9 +690,8 @@
             const mY = motiRect.top + (motiRect.height / 2);
             const cX = cellRect.left + (cellRect.width / 2);
             const cY = cellRect.top + (cellRect.height / 2);
-            const dist = Math.hypot(mX - cX, mY - cY);
             
-            if(dist < 150) { moti.classList.add('eating'); } 
+            if(Math.hypot(mX - cX, mY - cY) < 160) { moti.classList.add('eating'); } 
             else { moti.classList.remove('eating'); }
         }
 
@@ -731,7 +704,7 @@
             const mY = motiRect.top + (motiRect.height / 2);
             const cX = cellRect.left + (cellRect.width / 2);
             const cY = cellRect.top + (cellRect.height / 2);
-            return (Math.hypot(mX - cX, mY - cY) < 100);
+            return (Math.hypot(mX - cX, mY - cY) < 110);
         }
 
         function triggerMotiEatEffect() {
@@ -766,7 +739,7 @@
             if (currentUser) {
                 currentUser = null;
                 localStorage.removeItem('memotive_current_user');
-                memories = []; cellNodesData = []; isEditMode = false;
+                memories = []; cellNodesData = [];
                 updateAuthUI();
                 showToast('로그아웃 되었습니다.');
                 navigateTo('home');
@@ -782,7 +755,6 @@
         function submitLogin() {
             const username = document.getElementById('auth-username-input').value.trim();
             if (!username) { alert('아이디를 입력해 주세요.'); return; }
-            if (username.toLowerCase() === 'guest') { alert('사용할 수 없는 이름입니다.'); return; }
             currentUser = username;
             localStorage.setItem('memotive_current_user', currentUser);
             loadUserData(); updateAuthUI(); closeAuthModal();
@@ -814,7 +786,9 @@
             else cancelAnimationFrame(petriAnimationId);
             if (pageId === 'calendar') renderCalendar();
             if (pageId === 'profile') renderProfile();
-            if (pageId === 'home') createAmbientCells();
+            
+            // 페이지 전환마다 배경 먹이 세포 가시성 제어 적용
+            createAmbientCells();
         }
 
         function showToast(message) {
@@ -861,7 +835,10 @@
                 const x = Math.random() * (dish.clientWidth - size - 40) + 20;
                 const y = Math.random() * (dish.clientHeight - size - 40) + 20;
                 node.style.left = x + 'px'; node.style.top = y + 'px';
-                node.addEventListener('click', () => openModal(mem));
+                node.addEventListener('click', () => {
+                    // 단일 세포 구체창 호출 시 포맷 정리
+                    openModal({ date: mem.date, content: `기억 1: ${mem.content}` });
+                });
                 dish.appendChild(node);
                 cellNodesData.push({ element: node, x: x, y: y, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, radius: size / 2, content: mem.content, date: mem.date });
             });
@@ -908,7 +885,12 @@
                     const icon = document.createElement('div'); icon.className = 'cell-icons';
                     const dot = document.createElement('span'); dot.className = 'cell-moti-dot'; icon.appendChild(dot);
                     cell.appendChild(icon);
-                    cell.onclick = () => openModal({ date: dateStr, content: dayMemories.map(m=>m.content).join('\n\n') });
+                    
+                    // ⭐️ [복구 핵심] 캘린더 날짜 클릭 시 기억 1, 기억 2 포맷으로 묶어서 모달 출력하도록 스크립트 전면 정비
+                    cell.onclick = () => {
+                        let combinedContent = dayMemories.map((m, index) => `기억 ${index + 1}: ${m.content}`).join('\n\n');
+                        openModal({ date: dateStr, content: combinedContent });
+                    };
                 }
                 grid.appendChild(cell);
             }
