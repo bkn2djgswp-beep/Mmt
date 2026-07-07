@@ -181,7 +181,6 @@
         .home-container {
             display: flex; flex-direction: column; align-items: center; position: relative; z-index: 10; pointer-events: none;
         }
-        /* 컨테이너 내부 버튼이나 캐릭터는 클릭이 되도록 복구 */
         .slogan, .main-title, .intro-text { user-select: none; }
         .moti-container, .btn-primary, .feed-guide-text { pointer-events: auto; }
         
@@ -234,7 +233,7 @@
         .moti-blush.left { left: -6px; }
         .moti-blush.right { right: -6px; }
 
-        /* 드래그 가능한 배경 연한 세포 레이어 (중요: 클릭 방해 해결) */
+        /* 배경 인터랙티브 셀 레이어 */
         .ambient-cells { 
             position: absolute; 
             top: 0; left: 0; width: 100%; height: 100%; 
@@ -242,29 +241,32 @@
             z-index: 5; 
             pointer-events: auto; 
         }
+
+        /* ⭐️ [수정] 먹이 세포 투명도 40% 적용 및 색상 시각화 개선 */
         .bg-cell { 
-            position: absolute; border-radius: 50%; 
-            background: rgba(185, 167, 255, 0.3); 
-            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
-            border: 1px solid rgba(255,255,255,0.5); 
+            position: absolute; 
+            border-radius: 50%; 
+            opacity: 0.4; /* 캐릭터 대비 40% 투명도 적용 */
+            backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
+            border: 2px solid rgba(255,255,255,0.7); 
             cursor: grab;
             pointer-events: auto;
-            box-shadow: 0 4px 12px rgba(126, 108, 249, 0.1);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
             display: flex; justify-content: center; align-items: center;
             user-select: none;
             z-index: 6;
             touch-action: none;
+            transition: transform 0.2s, opacity 0.2s;
         }
-        .bg-cell:active { cursor: grabbing; z-index: 999; }
+        .bg-cell:active { cursor: grabbing; z-index: 999; opacity: 0.8; transform: scale(1.15); }
         
-        /* 밥 주기 가이드 문구 스타일 (연한 글씨) */
+        /* 밥 주기 가이드 문구 스타일 */
         .feed-guide-text {
             font-size: 14px;
-            color: #9aa1b9;
-            font-weight: 500;
+            color: #7d849a;
+            font-weight: 600;
             margin-top: 35px;
             letter-spacing: 0.3px;
-            opacity: 0.75;
             user-select: none;
             animation: pulseText 2s infinite ease-in-out;
         }
@@ -588,13 +590,12 @@
         let petriAnimationId = null;
         let isEditMode = false;
 
-        // 상호작용 관련 로컬 제어 변수
         let motiPressTimer = null;
         let isLongPressed = false;
 
         document.addEventListener('DOMContentLoaded', () => {
             initCharCounter();
-            createAmbientCells(); // 배경 세포 밥알 로드
+            createAmbientCells(); 
             loadUserData(); 
             updateAuthUI();
 
@@ -602,17 +603,12 @@
             document.getElementById('auth-modal').addEventListener('click', function(e) { if(e.target === this) closeAuthModal(); });
         });
 
-        /* ========================================================
-           ✨ 캐릭터 상호작용 핵심 스크립트 (수정 및 교정 완료)
-           ======================================================== */
-
-        // 1. 캐릭터 꾹 누르기 (Long Press) 판정 코드
+        // 1. 캐릭터 꾹 누르기 판정
         function startMotiPress(e) {
             const moti = document.getElementById('main-moti');
             if(!moti) return;
-            
             isLongPressed = false;
-            moti.style.transform = "scale(0.92)"; // 누르는 맛이 나는 실시간 축소
+            moti.style.transform = "scale(0.92)";
 
             motiPressTimer = setTimeout(() => {
                 isLongPressed = true;
@@ -620,26 +616,22 @@
                 moti.classList.add('spread-effect');
                 showToast('🧪 세포 자극! 캐릭터가 유연하게 사방으로 퍼집니다.');
                 
-                setTimeout(() => {
-                    moti.classList.remove('spread-effect');
-                }, 600);
-            }, 600); // 0.6초 이상 누르고 있을 때 작동
+                setTimeout(() => { moti.classList.remove('spread-effect'); }, 600);
+            }, 600);
         }
 
         function endMotiPress(e) {
             clearTimeout(motiPressTimer);
             const moti = document.getElementById('main-moti');
-            if(moti) {
-                moti.style.transform = "";
-            }
+            if(moti) { moti.style.transform = ""; }
         }
 
-        // 2. 배경 세포 생성 및 완벽한 드래그 앤 드롭 밥 주기 기능
+        // 2. 배경 세포 생성 및 드래그 앤 드롭 밥 주기 기능
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
             container.innerHTML = ''; 
-            const maxCells = 10; // 화면에 떠다닐 세포 밥 개수
+            const maxCells = 10;
 
             for(let i=0; i<maxCells; i++) {
                 makeSingleFeedCell(container);
@@ -650,15 +642,25 @@
             const cell = document.createElement('div');
             cell.className = 'bg-cell';
             
-            const size = Math.random() * 25 + 30; // 30px ~ 55px 랜덤 크기
+            const size = Math.random() * 25 + 30; 
             cell.style.width = size + 'px';
             cell.style.height = size + 'px';
             
-            // 화면 안에 골고루 랜덤 배치
             cell.style.left = (Math.random() * 80 + 10) + '%';
             cell.style.top = (Math.random() * 60 + 15) + '%';
             cell.innerHTML = "✨";
             cell.style.fontSize = (size * 0.45) + "px";
+
+            // ⭐️ [수정] 민트, 하늘, 푸른색 계열 40% 투명도 컬러셋 무작위 바인딩
+            const colorPalettes = [
+                'rgba(167, 231, 215, 1)',  /* 민트 */
+                'resolve-sky',
+                'rgba(205, 232, 255, 1)',  /* 하늘 */
+                'rgba(135, 206, 250, 1)',  /* 연파랑 */
+                'rgba(173, 216, 230, 1)'   /* 푸른색 */
+            ];
+            const chosenColor = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
+            cell.style.backgroundColor = chosenColor;
 
             let isDragging = false;
             let startX = 0, startY = 0;
@@ -666,7 +668,7 @@
             const onDragStart = (e) => {
                 isDragging = true;
                 cell.style.transform = 'scale(1.2)';
-                cell.style.background = 'rgba(126, 108, 249, 0.45)';
+                cell.style.opacity = '0.9'; // 드래그 시 선명하게 변경
                 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -683,7 +685,6 @@
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
                 
-                // 부모 컨테이너 기준 절대좌표 매핑 계산
                 const containerRect = parentContainer.getBoundingClientRect();
                 let newX = clientX - containerRect.left - startX;
                 let newY = clientY - containerRect.top - startY;
@@ -691,7 +692,6 @@
                 cell.style.left = newX + 'px';
                 cell.style.top = newY + 'px';
 
-                // 실시간 거리 감지하여 메인 캐릭터 입 벌리기 유도
                 checkMotiMouthOpen(cell);
             };
 
@@ -699,92 +699,64 @@
                 if (!isDragging) return;
                 isDragging = false;
                 cell.style.transform = '';
-                cell.style.background = '';
+                cell.style.opacity = '0.4'; // 원래 투명도 40%로 복귀
 
-                // 최종 메인 세포 입 안에 들어왔는지 확인
                 if (checkEatSuccess(cell)) {
                     triggerMotiEatEffect();
-                    cell.remove(); // 밥알 소멸
-                    
-                    // 2.5초 뒤 새로운 곳에서 세포가 리필 공급됨
-                    setTimeout(() => {
-                        makeSingleFeedCell(parentContainer);
-                    }, 2500);
+                    cell.remove(); 
+                    setTimeout(() => { makeSingleFeedCell(parentContainer); }, 2500);
                 } else {
                     document.getElementById('main-moti').classList.remove('eating');
                 }
             };
 
-            // 데스크탑 마우스 이벤트 바인딩
             cell.addEventListener('mousedown', onDragStart);
             document.addEventListener('mousemove', onDragMove);
             document.addEventListener('mouseup', onDragEnd);
 
-            // 모바일 터치 이벤트 바인딩
             cell.addEventListener('touchstart', onDragStart, { passive: false });
             document.addEventListener('touchmove', onDragMove, { passive: false });
             document.addEventListener('touchend', onDragEnd);
         }
 
-        // 밥알이 근처에 오면 메인세포가 입을 벌리게 만드는 판정
         function checkMotiMouthOpen(cellEl) {
             const moti = document.getElementById('main-moti');
             if(!moti) return;
-            
             const motiRect = moti.getBoundingClientRect();
             const cellRect = cellEl.getBoundingClientRect();
-
             const mX = motiRect.left + (motiRect.width / 2);
             const mY = motiRect.top + (motiRect.height / 2);
             const cX = cellRect.left + (cellRect.width / 2);
             const cY = cellRect.top + (cellRect.height / 2);
-
             const dist = Math.hypot(mX - cX, mY - cY);
             
-            if(dist < 150) { // 150px 이내 접근 시 입 벌림
-                moti.classList.add('eating');
-            } else {
-                moti.classList.remove('eating');
-            }
+            if(dist < 150) { moti.classList.add('eating'); } 
+            else { moti.classList.remove('eating'); }
         }
 
-        // 실제로 밥 주기 판정이 통과되었는지 체크
         function checkEatSuccess(cellEl) {
             const moti = document.getElementById('main-moti');
             if(!moti) return false;
-            
             const motiRect = moti.getBoundingClientRect();
             const cellRect = cellEl.getBoundingClientRect();
-
             const mX = motiRect.left + (motiRect.width / 2);
             const mY = motiRect.top + (motiRect.height / 2);
             const cX = cellRect.left + (cellRect.width / 2);
             const cY = cellRect.top + (cellRect.height / 2);
-
-            const dist = Math.hypot(mX - cX, mY - cY);
-            return (dist < 100); // 100px 중심 원 안에 충돌 시 성공
+            return (Math.hypot(mX - cX, mY - cY) < 100);
         }
 
-        // 성공 리액션 애니메이션 작동
         function triggerMotiEatEffect() {
             const moti = document.getElementById('main-moti');
             if(!moti) return;
-            
             moti.classList.remove('eating', 'spread-effect');
-            void moti.offsetWidth; // 리플로우 유동화 트리거
+            void moti.offsetWidth; 
             moti.classList.add('eat-effect');
-            
             showToast('냠냠! 연한 세포 먹이를 주어 에너지를 가득 흡수했습니다! 🔋');
-            
-            setTimeout(() => {
-                moti.classList.remove('eat-effect');
-            }, 400);
+            setTimeout(() => { moti.classList.remove('eat-effect'); }, 400);
         }
 
-
-        /* ========================================================
-           [기존 웹사이트 데이터 핸들링 및 라우팅 로직 코드 유지]
-           ======================================================== */
+        /* [기존 데이터 보관 관리 시스템 스크립트 그대로 유지] */
         function loadUserData() {
             if (!currentUser) { memories = []; targetGoal = 20; } 
             else {
@@ -855,7 +827,7 @@
             else cancelAnimationFrame(petriAnimationId);
             if (pageId === 'calendar') renderCalendar();
             if (pageId === 'profile') renderProfile();
-            if (pageId === 'home') createAmbientCells(); // 홈으로 오면 세포 재생성
+            if (pageId === 'home') createAmbientCells();
         }
 
         function showToast(message) {
@@ -902,7 +874,6 @@
                 const x = Math.random() * (dish.clientWidth - size - 40) + 20;
                 const y = Math.random() * (dish.clientHeight - size - 40) + 20;
                 node.style.left = x + 'px'; node.style.top = y + 'px';
-                
                 node.addEventListener('click', () => openModal(mem));
                 dish.appendChild(node);
                 cellNodesData.push({ element: node, x: x, y: y, vx: (Math.random() - 0.5) * 0.4, vy: (Math.random() - 0.5) * 0.4, radius: size / 2, content: mem.content, date: mem.date });
