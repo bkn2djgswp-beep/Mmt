@@ -324,12 +324,28 @@
         .modal-date { font-size: 14px; color: var(--brand-main); font-weight: 700; margin-bottom: 14px; }
         .modal-body { font-size: 16px; line-height: 1.7; color: #444; white-space: pre-wrap; word-break: break-all; }
 
-        /* Custom Auth Prompt Modal (기본 prompt 대체로 깔끔한 UI 제공) */
+        /* Custom Auth Prompt Modal */
         .auth-modal-content { text-align: center; }
         .auth-modal-content h3 { margin-bottom: 15px; font-size: 20px; }
         .auth-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 15px; outline: none; text-align: center; }
         .auth-modal-btns { display: flex; flex-direction: column; gap: 10px; }
         .btn-guest { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; padding: 10px; border-radius: 20px; font-weight: 600; cursor: pointer; }
+
+        /* --- FOOTER STYLE (새로 추가됨) --- */
+        footer {
+            width: 100%;
+            padding: 20px 0 30px 0;
+            text-align: center;
+            background: transparent;
+            z-index: 10;
+        }
+        .footer-content {
+            font-size: 13px;
+            color: #888ea8;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            opacity: 0.8;
+        }
 
         /* --- ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
@@ -442,8 +458,13 @@
                     <div class="profile-footer-text">"Every memory builds tomorrow."</div>
                 </div>
             </div>
-        </section>
-    </main>
+        </main>
+
+        <footer>
+            <div class="footer-content">
+                Chungnam Arts High School - Design Major | Created by Somi Kwon
+            </div>
+        </footer>
 
     <div class="modal-overlay" id="detail-modal">
         <div class="modal-content">
@@ -481,7 +502,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             initCharCounter();
             createAmbientCells();
-            loadUserData(); // 유저별 데이터 분리 로드 함수 호출
+            loadUserData(); 
             updateAuthUI();
 
             document.getElementById('detail-modal').addEventListener('click', function(e) {
@@ -492,18 +513,15 @@
             });
         });
 
-        // 현재 로그인 유저에 맞는 격리 저장소 연동 로직
         function loadUserData() {
             if (!currentUser) {
                 memories = [];
                 targetGoal = 20;
             } else {
-                // 각 유저 고유의 키로 데이터 격리 수집 (memories_abc, targetGoal_abc 등)
                 memories = JSON.parse(localStorage.getItem(`memories_${currentUser}`)) || [];
                 targetGoal = parseInt(localStorage.getItem(`targetGoal_${currentUser}`)) || 20;
             }
             
-            // 배지 정보 업데이트
             const badgeText = currentUser === 'guest' ? '(가입 없이 사용 중)' : (currentUser ? `(${currentUser}님 계정)` : '');
             document.getElementById('write-user-badge').innerText = badgeText;
             document.getElementById('cells-user-badge').innerText = badgeText;
@@ -521,7 +539,6 @@
 
         function openAuthModal() {
             if (currentUser) {
-                // 로그아웃 수행 시 데이터 차단 처리
                 currentUser = null;
                 localStorage.removeItem('memotive_current_user');
                 loadUserData();
@@ -538,7 +555,6 @@
             document.getElementById('auth-modal').classList.remove('show');
         }
 
-        // 특정 아이디 계정으로 가입/로그인 시
         function submitLogin() {
             const username = document.getElementById('auth-username-input').value.trim();
             if (!username) { alert('아이디를 입력해 주세요.'); return; }
@@ -553,7 +569,6 @@
             navigateTo('cells');
         }
 
-        // '가입 없이 사용' 전용 독립 세션 오픈 함수
         function loginAsGuest() {
             currentUser = 'guest';
             localStorage.setItem('memotive_current_user', currentUser);
@@ -581,7 +596,6 @@
             }
         }
 
-        // 로그아웃 상태에서 메뉴 강제 이동을 방어하는 보안 로직 구축
         function navigateTo(pageId) {
             if (pageId !== 'home' && !currentUser) {
                 alert('로그인 또는 [가입 없이 사용하기]를 클릭해야 공간을 이용할 수 있습니다!');
@@ -629,7 +643,6 @@
             const newMemory = { id: Date.now(), date: dateStr, content: text, timestamp: now.getTime() };
             memories.push(newMemory);
             
-            // 현재 로그인된 유저 전용 저장소 키에 세이브
             localStorage.setItem(`memories_${currentUser}`, JSON.stringify(memories));
 
             textarea.value = '';
@@ -645,7 +658,6 @@
             dish.innerHTML = '';
             dish.appendChild(msg);
 
-            // 비로그인 상태면 아무 세포도 렌더링하지 않음
             if (!currentUser || memories.length === 0) { msg.style.display = 'block'; return; } 
             else { msg.style.display = 'none'; }
 
@@ -860,6 +872,7 @@
             document.getElementById('detail-modal').classList.remove('show');
         }
 
+        // 앰비언트 백그라운드 세포 생성 함수
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
