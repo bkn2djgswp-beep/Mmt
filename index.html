@@ -63,6 +63,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            user-select: none;
         }
 
         .logo .logo-dot {
@@ -192,7 +193,9 @@
         .intro-text {
             font-size: 17px; color: #666; line-height: 1.6; max-width: 600px; margin-bottom: 40px;
         }
-        .moti-container { position: relative; width: 220px; height: 220px; margin-bottom: 40px; }
+        
+        /* 메인 캐릭터 영역 및 상호작용 애니메이션 관련 */
+        .moti-container { position: relative; width: 220px; height: 220px; margin-bottom: 30px; }
         .moti {
             width: 100%; height: 100%;
             background: radial-gradient(circle at 35% 35%, #E6E1FF 0%, var(--brand-sub) 60%, var(--brand-main) 100%);
@@ -200,20 +203,65 @@
             box-shadow: 0 15px 35px rgba(126, 108, 249, 0.2), inset -10px -10px 20px rgba(0,0,0,0.1);
             animation: float 4s ease-in-out infinite;
             display: flex; justify-content: center; align-items: center;
+            cursor: grab;
+            user-select: none;
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .moti-face { width: 80px; height: 40px; position: relative; display: flex; justify-content: space-between; align-items: center; }
+        .moti:active { cursor: grabbing; }
+        
+        /* 꾹 눌렀을 때 터지는 퍼짐 효과 클래스 */
+        .moti.spread-effect {
+            animation: spreadBlast 0.6s ease-out forwards;
+        }
+        /* 밥 먹었을 때 움찔 커지는 클래스 */
+        .moti.eat-effect {
+            animation: eatBump 0.4s ease-out forwards;
+        }
+
+        .moti-face { width: 80px; height: 40px; position: relative; display: flex; justify-content: space-between; align-items: center; transition: transform 0.2s; }
         .moti-eye { width: 16px; height: 16px; background: #222; border-radius: 50%; position: relative; }
         .moti-eye::after { content: ''; position: absolute; top: 3px; left: 3px; width: 5px; height: 5px; background: white; border-radius: 50%; }
-        .moti-mouth { width: 14px; height: 8px; border-bottom: 3px solid #222; border-radius: 0 0 10px 10px; position: absolute; bottom: 5px; left: 33px; }
+        .moti-mouth { width: 14px; height: 8px; border-bottom: 3px solid #222; border-radius: 0 0 10px 10px; position: absolute; bottom: 5px; left: 33px; transition: all 0.2s; }
+        
+        /* 밥 먹을 때 입이 벌어지는 스케일 */
+        .moti.eating .moti-mouth {
+            width: 16px; height: 16px; border: 3px solid #222; border-radius: 50%; bottom: 1px; background: #222;
+        }
+
         .moti-blush { width: 12px; height: 8px; background: rgba(255, 100, 150, 0.4); border-radius: 50%; position: absolute; bottom: 8px; }
         .moti-blush.left { left: -6px; }
         .moti-blush.right { right: -6px; }
 
-        .ambient-cells { position: absolute; width: 100%; height: 100%; top: 0; left: 0; pointer-events: none; z-index: -1; }
-        .bg-cell { position: absolute; border-radius: 50%; background: var(--glass-bg); backdrop-filter: blur(4px); border: 1px solid var(--glass-border); animation: float random ease-in-out infinite; opacity: 0.6; }
+        /* 드래그 가능한 홈화면 배경 연한 세포들 */
+        .ambient-cells { position: absolute; width: 100vw; height: 100vh; top: -70px; left: -20px; pointer-events: none; z-index: 1; }
+        .bg-cell { 
+            position: absolute; border-radius: 50%; 
+            background: rgba(185, 167, 255, 0.25); 
+            backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px);
+            border: 1px solid rgba(255,255,255,0.4); 
+            cursor: grab;
+            pointer-events: auto;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            display: flex; justify-content: center; align-items: center;
+            user-select: none;
+            transition: opacity 0.3s;
+        }
+        .bg-cell:active { cursor: grabbing; z-index: 999; }
+        
+        /* 밥 주기 가이드 문구 스타일 (연한 글씨) */
+        .feed-guide-text {
+            font-size: 13.5px;
+            color: #9aa1b9;
+            font-weight: 500;
+            margin-top: 25px;
+            letter-spacing: 0.3px;
+            opacity: 0.75;
+            user-select: none;
+            animation: pulseText 2s infinite ease-in-out;
+        }
 
         /* --- WRITE PAGE --- */
-        .write-wrapper { max-width: 650px; margin: 0 auto; }
+        .write-wrapper { max-width: 650px; margin: 0 auto; position: relative; z-index: 10; }
         .write-wrapper h2 { font-size: 24px; margin-bottom: 24px; text-align: center; }
         .textarea-container { position: relative; margin-bottom: 20px; }
         textarea {
@@ -235,6 +283,7 @@
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
 
         /* --- MEMORY CELLS PAGE --- */
+        .cells-layout { position: relative; z-index: 10; width: 100%; }
         .cells-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
         .cells-header-right { display: flex; align-items: center; gap: 12px; }
         .search-box { position: relative; width: 240px; }
@@ -268,14 +317,10 @@
             transition: filter 0.3s ease, opacity 0.3s ease, border-color 0.2s;
             user-select: none; z-index: 5;
         }
-        .memory-cell-node:hover {
-            filter: brightness(1.1);
-            z-index: 50;
-        }
+        .memory-cell-node:hover { filter: brightness(1.1); z-index: 50; }
         .memory-cell-node.blur-out { opacity: 0.2; filter: blur(2px); }
         .memory-cell-node.highlight-in { opacity: 1; filter: blur(0); border: 2px solid var(--brand-main); }
         
-        /* 세포 삭제 버튼 디자인 스타일 */
         .cell-delete-btn {
             position: absolute; top: -2px; right: -2px; width: 22px; height: 22px;
             background: #e63946; color: white; border-radius: 50%; display: none;
@@ -283,11 +328,10 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.2); border: 1.5px solid white; cursor: pointer; z-index: 60;
         }
         .cell-delete-btn:hover { background: #c92a3a; transform: scale(1.1); }
-        
         .no-memories-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: #778; font-weight: 600; display: none; }
 
         /* --- CALENDAR PAGE --- */
-        .calendar-container { max-width: 700px; margin: 0 auto; }
+        .calendar-container { max-width: 700px; margin: 0 auto; position: relative; z-index: 10; }
         .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
         .calendar-header h3 { font-size: 22px; font-weight: 700; }
         .calendar-nav-btn { background: white; border: 1px solid rgba(0,0,0,0.08); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; display: flex; justify-content: center; align-items: center; }
@@ -305,6 +349,7 @@
         .cell-moti-count { background: var(--brand-main); color: white; font-size: 10px; padding: 1px 5px; border-radius: 8px; font-weight: 700; }
 
         /* --- PROFILE PAGE --- */
+        .profile-layout { position: relative; z-index: 10; width: 100%; }
         .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         @media (max-width: 768px) { .profile-grid { grid-template-columns: 1fr; } }
         .stats-list { display: flex; flex-direction: column; gap: 16px; }
@@ -353,24 +398,34 @@
 
         /* --- FOOTER STYLE --- */
         footer {
-            width: 100%;
-            padding: 20px 0 30px 0;
-            text-align: center;
-            background: transparent;
-            z-index: 10;
+            width: 100%; padding: 20px 0 30px 0; text-align: center; background: transparent; z-index: 10;
         }
         .footer-content {
-            font-size: 13px;
-            color: #888ea8;
-            font-weight: 500;
-            letter-spacing: 0.5px;
-            opacity: 0.8;
+            font-size: 13px; color: #888ea8; font-weight: 500; letter-spacing: 0.5px; opacity: 0.8;
         }
 
-        /* --- ANIMATIONS --- */
+        /* --- KEYFRAMES ANIMATIONS --- */
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(185, 167, 255, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(185, 167, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(185, 167, 255, 0); } }
+        @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 0.9; } }
+        
+        /* 꾹 눌렀을 때의 젤리 사방 퍼짐 키프레임 */
+        @keyframes spreadBlast {
+            0% { transform: scale(1); border-radius: 50%; filter: blur(0); }
+            30% { transform: scale(1.4, 0.7); border-radius: 40% 60% 35% 65% / 50% 40% 60% 50%; }
+            50% { transform: scale(0.8, 1.3); filter: drop-shadow(0 0 15px var(--brand-sub)); }
+            70% { transform: scale(1.1, 0.9); border-radius: 48% 52% 45% 55% / 52% 48% 52% 48%; }
+            100% { transform: scale(1); border-radius: 50%; filter: blur(0); }
+        }
+        
+        /* 밥 먹었을 때 리드미컬하게 커지는 효과 */
+        @keyframes eatBump {
+            0% { transform: scale(1); }
+            40% { transform: scale(1.22); box-shadow: 0 20px 45px rgba(167, 231, 215, 0.5); }
+            70% { transform: scale(0.95); }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
@@ -395,8 +450,11 @@
                 <p class="slogan">Every Cell Remembers.</p>
                 <h1 class="main-title">Remember Today.<br>Grow Tomorrow.</h1>
                 <p class="intro-text">기억세포는 한 번 경험한 정보를 오랫동안 기억합니다. Memotive는 소중한 하루를 세포로 보관하며 더 빛나는 내일을 만들어갑니다.</p>
+                
                 <div class="moti-container">
-                    <div class="moti">
+                    <div class="moti" id="main-moti" 
+                         onmousedown="startMotiPress()" onmouseup="endMotiPress()" onmouseleave="endMotiPress()"
+                         ontouchstart="startMotiPress()" ontouchend="endMotiPress()">
                         <div class="moti-face">
                             <div class="moti-blush left"></div>
                             <div class="moti-eye" style="left:0"></div>
@@ -407,13 +465,15 @@
                     </div>
                 </div>
                 <div><button class="btn-primary" onclick="navigateTo('write')">오늘의 기억 기록하기 <i class="fa-solid fa-arrow-right"></i></button></div>
-                <div class="ambient-cells" id="ambient-cells-container"></div>
+                
+                <p class="feed-guide-text"><i class="fa-solid fa-hand-pointer"></i> 캐릭터를 꾹 누르거나, 배경의 연한 세포들을 드래그해서 먹이를 줘보세요!</p>
             </div>
+            <div class="ambient-cells" id="ambient-cells-container"></div>
         </section>
 
         <section id="page-write" class="page">
             <div class="write-wrapper glass-card">
-                <h2>오늘의 기억은 무엇인가요? <span id="write-user-badge" style="font-size:14px; color:var(--brand-main);"></span></h2>
+                <h2>오늘의 기억은 무엇인가요? <span id="write-user-badge" style="font-size:14px; colorvar(--brand-main);"></span></h2>
                 <div class="textarea-container">
                     <textarea id="memory-input" maxlength="300" placeholder="이곳에 기록된 당신의 경험은 세포가 되어 영원히 보관됩니다. (최대 300자)"></textarea>
                     <div class="char-counter"><span id="char-count">0</span> / 300</div>
@@ -423,7 +483,7 @@
         </section>
 
         <section id="page-cells" class="page">
-            <div class="glass-card">
+            <div class="cells-layout glass-card">
                 <div class="cells-header">
                     <h2>Memory Cells <span id="cells-user-badge" style="font-size:16px; color:#667085; font-weight:500;"></span></h2>
                     <div class="cells-header-right">
@@ -452,7 +512,7 @@
         </section>
 
         <section id="page-profile" class="page">
-            <div class="glass-card">
+            <div class="profile-layout glass-card">
                 <h2 style="margin-bottom: 25px;">성장 리포트 <span id="profile-user-badge" style="font-size:16px; color:#667085; font-weight:500;"></span></h2>
                 <div class="profile-grid">
                     <div class="stats-list">
@@ -521,7 +581,10 @@
         let currentMonth = 6; 
         let cellNodesData = [];
         let petriAnimationId = null;
-        let isEditMode = false; // 편집 모드 활성화 유무 플래그
+        let isEditMode = false;
+
+        // 상호작용 관련 내부 타이머 변수
+        let motiPressTimer = null;
 
         document.addEventListener('DOMContentLoaded', () => {
             initCharCounter();
@@ -630,7 +693,6 @@
                 return;
             }
 
-            // 페이지 이탈 시 편집 모드 초기화 강제 해제
             if (isEditMode) {
                 isEditMode = false;
                 const btn = document.getElementById('btn-edit-toggle');
@@ -662,7 +724,7 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        initCharCounter = () => {
+        function initCharCounter() {
             const textarea = document.getElementById('memory-input');
             const counter = document.getElementById('char-count');
             textarea.addEventListener('input', () => { counter.innerText = textarea.value.length; });
@@ -689,7 +751,6 @@
             setTimeout(() => navigateTo('cells'), 800);
         }
 
-        // --- EDIT MODE TOGGLE FUNCTION (기억세포 정지 및 삭제 토글 로직) ---
         function toggleEditMode() {
             if (!currentUser || memories.length === 0) return;
             
@@ -698,17 +759,13 @@
             const deleteButtons = document.querySelectorAll('.cell-delete-btn');
 
             if (isEditMode) {
-                // 편집 모드 켜짐 -> 애니메이션 멈춤 및 X 노출
                 cancelAnimationFrame(petriAnimationId);
                 btn.classList.add('active');
                 btn.innerHTML = '<i class="fa-solid fa-check"></i> 완료하기';
                 deleteButtons.forEach(b => b.style.display = 'flex');
-                
-                // 편집 시에는 검색창 무력화
                 document.getElementById('cell-search').value = '';
                 searchCells();
             } else {
-                // 편집 모드 꺼짐 -> 애니메이션 다시 기동 및 X 숨김
                 btn.classList.remove('active');
                 btn.innerHTML = '<i class="fa-solid fa-pen"></i> 편집하기';
                 deleteButtons.forEach(b => b.style.display = 'none');
@@ -716,20 +773,13 @@
             }
         }
 
-        // 특정 세포 삭제 실행 함수
         function deleteCell(id, event) {
-            event.stopPropagation(); // 세포 클릭 이벤트(상세 모달 팝업) 방지
-            
+            event.stopPropagation();
             if (confirm('이 기억세포를 정말로 소멸시키겠습니까? 되돌릴 수 없습니다.')) {
-                // 1. 메모리 배열에서 삭제 대상 ID 필터링
                 memories = memories.filter(m => m.id !== id);
-                
-                // 2. 계정별 로컬 저장소 최신화
                 localStorage.setItem(`memories_${currentUser}`, JSON.stringify(memories));
-                
                 showToast('기억세포가 소멸되었습니다.');
                 
-                // 3. 편집 상태 유지하며 페트리접시 화면 재구성
                 const currentEditState = isEditMode;
                 renderMemoryCells();
                 
@@ -752,7 +802,6 @@
             dish.innerHTML = '';
             dish.appendChild(msg);
 
-            // 편집하기 버튼 상태 제어
             const editToggleBtn = document.getElementById('btn-edit-toggle');
             if (!currentUser || memories.length === 0) {
                 msg.style.display = 'block';
@@ -786,7 +835,6 @@
                 node.style.left = `${x}px`;
                 node.style.top = `${y}px`;
 
-                // 개별 세포 삭제 전용 엘리먼트 동적 탑재
                 const delBtn = document.createElement('div');
                 delBtn.className = 'cell-delete-btn';
                 delBtn.innerHTML = '&times;';
@@ -794,7 +842,7 @@
                 node.appendChild(delBtn);
 
                 node.addEventListener('click', (e) => {
-                    if (isEditMode) return; // 편집 상태에서는 상세 모달창 열기를 방어
+                    if (isEditMode) return; 
                     e.stopPropagation(); 
                     openModal(mem);
                 });
@@ -819,7 +867,7 @@
         }
 
         function animatePetriDish() {
-            if (isEditMode) return; // 편집 상태일 경우 움직임 캔슬
+            if (isEditMode) return; 
             const dish = document.getElementById('petri-dish');
             if(!dish) return;
             const W = dish.clientWidth;
@@ -845,7 +893,7 @@
         }
 
         function searchCells() {
-            if (isEditMode) return; // 편집모드일 때는 검색 중단
+            if (isEditMode) return; 
             const query = document.getElementById('cell-search').value.toLowerCase().trim();
             const msg = document.getElementById('no-memories-msg');
             let hasResult = false;
@@ -986,22 +1034,180 @@
             document.getElementById('detail-modal').classList.remove('show');
         }
 
+
+        /* ========================================================
+           ✨ INTERACTIVE INTERACTION SCRIPT (캐릭터 상호작용 관련 자바스크립트)
+           ======================================================== */
+
+        // 1. 캐릭터 꾹 누르기 인터랙션
+        function startMotiPress() {
+            const moti = document.getElementById('main-moti');
+            moti.style.transform = "scale(0.9)"; // 누르고 있을 때 살짝 압축
+            
+            motiPressTimer = setTimeout(() => {
+                // 0.5초 이상 누르고 있을 때 퍼짐 애니메이션 시동
+                moti.classList.add('spread-effect');
+                showToast('🧪 세포 자극 활성화! 세포가 사방으로 유연하게 분열 및 퍼집니다.');
+                
+                setTimeout(() => {
+                    moti.classList.remove('spread-effect');
+                }, 600);
+            }, 500);
+        }
+
+        function endMotiPress() {
+            clearTimeout(motiPressTimer);
+            const moti = document.getElementById('main-moti');
+            if(moti) moti.style.transform = "scale(1)";
+        }
+
+
+        // 2. 배경 연한 세포 자동 생성 및 드래그 앤 드롭 밥 주기 기능 구현
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
+            container.innerHTML = ''; // 초기화
             const count = 12;
+
             for(let i=0; i<count; i++) {
-                const cell = document.createElement('div');
-                cell.className = 'bg-cell';
-                const size = Math.random() * 40 + 20;
-                cell.style.width = size + 'px';
-                cell.style.height = size + 'px';
-                cell.style.left = Math.random() * 90 + 5 + '%';
-                cell.style.top = Math.random() * 80 + 10 + '%';
-                cell.style.animationDuration = (Math.random() * 4 + 4) + 's';
-                cell.style.animationDelay = (Math.random() * -5) + 's';
-                container.appendChild(cell);
+                makeSingleFeedCell(container);
             }
+        }
+
+        function makeSingleFeedCell(parentContainer) {
+            const cell = document.createElement('div');
+            cell.className = 'bg-cell';
+            
+            const size = Math.random() * 35 + 25; // 25px ~ 60px 랜덤 크기
+            cell.style.width = size + 'px';
+            cell.style.height = size + 'px';
+            cell.style.left = Math.random() * 85 + 5 + '%';
+            cell.style.top = Math.random() * 75 + 10 + '%';
+            cell.style.opacity = '0.5';
+            
+            // 귀여운 이모지 밥 알갱이 형태 추가
+            cell.innerHTML = "✨";
+            cell.style.fontSize = (size * 0.4) + "px";
+
+            // 마우스/터치 드래그 바인딩 코드
+            let isDragging = false;
+            let startX, startY;
+            let currentLeft, currentTop;
+
+            const dragStart = (e) => {
+                isDragging = true;
+                cell.style.opacity = '0.9';
+                cell.style.transform = 'scale(1.1)';
+                
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                
+                startX = clientX - cell.offsetLeft;
+                startY = clientY - cell.offsetTop;
+                
+                if(!e.type.includes('touch')) e.preventDefault();
+            };
+
+            const dragMove = (e) => {
+                if (!isDragging) return;
+                
+                const clientX = e.type.includes('touch') ? e.touches[0].clientX : e.clientX;
+                const clientY = e.type.includes('touch') ? e.touches[0].clientY : e.clientY;
+                
+                let x = clientX - startX;
+                let y = clientY - startY;
+                
+                cell.style.left = x + 'px';
+                cell.style.top = y + 'px';
+
+                // 메인 캐릭터 입 벌리는 실시간 충돌 계산 감지
+                checkCollisionRealtime(cell);
+            };
+
+            const dragEnd = () => {
+                if (!isDragging) return;
+                isDragging = false;
+                cell.style.opacity = '0.5';
+                cell.style.transform = 'scale(1)';
+
+                // 최종 먹이 섭취 충돌 판정
+                if (checkEatSuccess(cell)) {
+                    // 먹이기 성공 처리
+                    triggerMotiEat();
+                    cell.style.opacity = '0';
+                    cell.style.pointerEvents = 'none';
+                    
+                    // 섭취 완료 후 사라진 자리에 3초 뒤 재생성
+                    setTimeout(() => {
+                        if(parentContainer.contains(cell)) cell.remove();
+                        makeSingleFeedCell(parentContainer);
+                    }, 300);
+                } else {
+                    // 섭취 안 됐을 경우 입 닫기 초기화
+                    document.getElementById('main-moti').classList.remove('eating');
+                }
+            };
+
+            cell.addEventListener('mousedown', dragStart);
+            document.addEventListener('mousemove', dragMove);
+            document.addEventListener('mouseup', dragEnd);
+
+            cell.addEventListener('touchstart', dragStart, { passive: true });
+            document.addEventListener('touchmove', dragMove, { passive: false });
+            document.addEventListener('touchend', dragEnd);
+        }
+
+        // 실시간 캐릭터 인접 유무 체크 (가까워지면 입을 벌림)
+        function checkCollisionRealtime(cellEl) {
+            const moti = document.getElementById('main-moti');
+            if(!moti) return;
+            
+            const motiRect = moti.getBoundingClientRect();
+            const cellRect = cellEl.getBoundingClientRect();
+
+            const mX = motiRect.left + (motiRect.width / 2);
+            const mY = motiRect.top + (motiRect.height / 2);
+            const cX = cellRect.left + (cellRect.width / 2);
+            const cY = cellRect.top + (cellRect.height / 2);
+
+            const distance = Math.hypot(mX - cX, mY - cY);
+            
+            // 일정 반경 안으로 먹이가 접근하면 입을 동적으로 벌림
+            if(distance < 160) {
+                moti.classList.add('eating');
+            } else {
+                moti.classList.remove('eating');
+            }
+        }
+
+        // 최종 합치기 충돌 판정 (섭취 성공 구역 검증)
+        function checkEatSuccess(cellEl) {
+            const moti = document.getElementById('main-moti');
+            if(!moti) return false;
+            
+            const motiRect = moti.getBoundingClientRect();
+            const cellRect = cellEl.getBoundingClientRect();
+
+            const mX = motiRect.left + (motiRect.width / 2);
+            const mY = motiRect.top + (motiRect.height / 2);
+            const cX = cellRect.left + (cellRect.width / 2);
+            const cY = cellRect.top + (cellRect.height / 2);
+
+            const distance = Math.hypot(mX - cX, mY - cY);
+            return (distance < 110); // 세포 중심 기준 110px 내 진입 시 먹기 성공
+        }
+
+        // 캐릭터 밥 먹었을 때 움찔 애니메이션 및 효과음 대용 리액션
+        function triggerMotiEat() {
+            const moti = document.getElementById('main-moti');
+            moti.classList.remove('eating');
+            moti.classList.add('eat-effect');
+            
+            showToast('냠냠!');
+            
+            setTimeout(() => {
+                moti.classList.remove('eat-effect');
+            }, 400);
         }
     </script>
 </body>
