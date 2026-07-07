@@ -162,22 +162,6 @@
             box-shadow: 0 6px 20px rgba(126, 108, 249, 0.4);
         }
 
-        .btn-sm {
-            padding: 6px 12px;
-            font-size: 12px;
-            border-radius: 15px;
-            background: #fff;
-            border: 1px solid rgba(0,0,0,0.15);
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.2s;
-            margin-top: 5px;
-        }
-        .btn-sm:hover {
-            background: #eee;
-            border-color: #888;
-        }
-
         /* --- HOME PAGE --- */
         #page-home { text-align: center; padding-top: 20px; width: 100%; position: relative; }
         .home-container {
@@ -228,31 +212,29 @@
         .moti-blush.left { left: -6px; }
         .moti-blush.right { right: -6px; }
 
-        /* ⭐️ [핵심 변경] 배경 인터랙티브 셀 레이어 최상위 화면 배치 설정 */
+        /* ⭐️ [인터랙션 버그 완벽 수정] 클릭/드래그 가로막힘을 없애기 위해 z-index 조정 및 포인터 이벤트를 완전히 관통 보정 */
         .ambient-cells { 
             position: fixed; 
             top: 0; left: 0; width: 100%; height: 100%; 
-            z-index: 2; 
-            pointer-events: none;
-            display: none; /* 기본 숨김 후 홈화면에서만 노출 */
+            z-index: 50; /* 캐릭터 카드보다 한 층 위에 띄워 드래그를 즉시 낚아챔 */
+            pointer-events: none; /* 컨테이너 자체는 통과시키고 하위 자식 .bg-cell만 입력 활성화 */
+            display: none;
         }
 
-        /* 배경 밥 세포 스타일 (투명도 40% 체감 보정 완료 및 네온 이펙트 강화) */
         .bg-cell { 
             position: absolute; 
             border-radius: 50%; 
-            opacity: 0.55; 
+            opacity: 0.75; /* 가시성 확보를 위해 불투명도를 대폭 상향 */
             backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
-            border: 2.5px solid #ffffff; 
+            border: 2px solid #ffffff; 
             cursor: grab;
-            pointer-events: auto;
+            pointer-events: auto; /* 개별 세포는 드래그가 무조건 먹히도록 선언 */
             display: flex; justify-content: center; align-items: center;
             user-select: none;
-            z-index: 5;
             touch-action: none;
-            transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
+            transition: transform 0.15s, opacity 0.2s;
         }
-        .bg-cell:active { cursor: grabbing; z-index: 999; opacity: 0.95; transform: scale(1.2); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+        .bg-cell:active { cursor: grabbing; opacity: 1; transform: scale(1.15); }
         
         .feed-guide-text {
             font-size: 14px; color: #7d849a; font-weight: 600; margin-top: 35px;
@@ -284,7 +266,6 @@
         /* --- MEMORY CELLS PAGE --- */
         .cells-layout glass-card { position: relative; z-index: 10; width: 100%; }
         .cells-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; flex-wrap: wrap; gap: 15px; }
-        .cells-header-right { display: flex; align-items: center; gap: 12px; }
         .search-box { position: relative; width: 240px; }
         .search-box input {
             width: 100%; padding: 10px 16px 10px 40px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.1);
@@ -293,15 +274,6 @@
         .search-box input:focus { background: var(--white); border-color: var(--brand-main); }
         .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #888; }
         
-        .btn-edit-mode {
-            background: #fff; border: 1px solid var(--brand-main); color: var(--brand-main);
-            padding: 9px 18px; border-radius: 20px; font-size: 14px; font-weight: 600; cursor: pointer;
-            transition: all 0.2s ease; display: flex; align-items: center; gap: 6px;
-        }
-        .btn-edit-mode:hover { background: rgba(126, 108, 249, 0.08); }
-        .btn-edit-mode.active { background: #e63946; border-color: #e63946; color: white; }
-        .btn-edit-mode.active:hover { background: #c92a3a; }
-
         .petri-dish {
             width: 100%; height: 550px; background: rgba(167, 231, 215, 0.15);
             border-radius: 24px; border: 1px solid rgba(167, 231, 215, 0.3);
@@ -319,6 +291,7 @@
         .memory-cell-node:hover { filter: brightness(1.1); z-index: 50; }
         .memory-cell-node.blur-out { opacity: 0.2; filter: blur(2px); }
         .memory-cell-node.highlight-in { opacity: 1; filter: blur(0); border: 2px solid var(--brand-main); }
+        .no-memories-msg { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 18px; color: #778; font-weight: 600; display: none; }
 
         /* --- CALENDAR PAGE --- */
         .calendar-container { max-width: 700px; margin: 0 auto; position: relative; z-index: 10; }
@@ -340,7 +313,6 @@
         /* --- PROFILE PAGE --- */
         .profile-layout { position: relative; z-index: 10; width: 100%; }
         .profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        @media (max-width: 768px) { .profile-grid { grid-template-columns: 1fr; } }
         .stats-list { display: flex; flex-direction: column; gap: 16px; }
         .stat-item { background: rgba(255,255,255,0.6); padding: 20px; border-radius: 16px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.3); }
         .stat-label { font-size: 15px; color: #666; font-weight: 500; }
@@ -351,7 +323,6 @@
         .progress-bar-circle { fill: none; stroke: url(#gradient-stroke); stroke-width: 12; stroke-linecap: round; stroke-dasharray: 440; stroke-dashoffset: 440; transition: stroke-dashoffset 1s ease-out; }
         .chart-box { position: relative; width: 160px; height: 160px; margin-bottom: 15px; }
         .chart-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 22px; font-weight: 800; color: var(--brand-main); }
-        .profile-footer-text { grid-column: span 2; text-align: center; font-size: 15px; font-weight: 600; color: #778; margin-top: 20px; }
 
         /* --- POPUP MODAL --- */
         .modal-overlay {
@@ -371,13 +342,11 @@
         .modal-close {
             position: absolute; top: 25px; right: 25px;
             background: none; border: none; font-size: 26px; color: #aaa; cursor: pointer;
-            transition: color 0.2s; line-height: 1;
         }
-        .modal-close:hover { color: #222; }
         .modal-date { font-size: 14px; color: var(--brand-main); font-weight: 700; margin-bottom: 14px; }
         .modal-body { font-size: 16px; line-height: 1.7; color: #444; white-space: pre-wrap; word-break: break-all; }
 
-        /* Auth Prompt Modal */
+        /* Auth Modal */
         .auth-modal-content { text-align: center; }
         .auth-modal-content h3 { margin-bottom: 15px; font-size: 20px; }
         .auth-input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid #ccc; margin-bottom: 15px; font-size: 15px; outline: none; text-align: center; }
@@ -385,7 +354,7 @@
         .btn-guest { background: #f1f3f5; color: #495057; border: 1px solid #dee2e6; padding: 10px; border-radius: 20px; font-weight: 600; cursor: pointer; }
 
         footer { width: 100%; padding: 20px 0 30px 0; text-align: center; background: transparent; z-index: 10; }
-        .footer-content { font-size: 13px; color: #888ea8; font-weight: 500; letter-spacing: 0.5px; opacity: 0.8; }
+        .footer-content { font-size: 13px; color: #888ea8; font-weight: 500; opacity: 0.8; }
 
         @keyframes fadeIn { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-12px); } 100% { transform: translateY(0px); } }
@@ -400,8 +369,8 @@
         }
         @keyframes eatBump {
             0% { transform: scale(1); }
-            35% { transform: scale(1.3); box-shadow: 0 25px 50px rgba(167, 231, 215, 0.6); }
-            65% { transform: scale(0.9); }
+            35% { transform: scale(1.25); box-shadow: 0 25px 50px rgba(26, 188, 156, 0.5); }
+            65% { transform: scale(0.92); }
             100% { transform: scale(1); }
         }
     </style>
@@ -446,7 +415,7 @@
                 </div>
                 <div><button class="btn-primary" onclick="navigateTo('write')">오늘의 기억 기록하기 <i class="fa-solid fa-arrow-right"></i></button></div>
                 
-                <p class="feed-guide-text"><i class="fa-solid fa-hand-pointer"></i> 캐릭터를 꾹 누르거나, 배경의 세포를 드래그해서 먹여보세요!</p>
+                <p class="feed-guide-text"><i class="fa-solid fa-hand-pointer"></i> 캐릭터를 꾹 누르거나, 배경의 세포를 드래그해서 입에 먹여보세요!</p>
             </div>
         </section>
 
@@ -589,13 +558,12 @@
             if(moti) { moti.style.transform = ""; }
         }
 
-        // 배경 세포 생성 스크립트 보정 및 영역 확보
+        // ⭐️ [세포 재생 메커니즘 엔진 전면 전비]
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
             container.innerHTML = ''; 
             
-            // 홈 화면 상태일 때만 활성화하여 가독성 인터럽트 제어
             const activePage = document.querySelector('.page.active');
             if (activePage && activePage.id === 'page-home') {
                 container.style.display = 'block';
@@ -604,7 +572,7 @@
                 return;
             }
 
-            const maxCells = 12;
+            const maxCells = 10;
             for(let i=0; i<maxCells; i++) {
                 makeSingleFeedCell(container);
             }
@@ -614,45 +582,44 @@
             const cell = document.createElement('div');
             cell.className = 'bg-cell';
             
-            const size = Math.random() * 20 + 35; 
+            const size = Math.random() * 15 + 40; 
             cell.style.width = size + 'px';
             cell.style.height = size + 'px';
             
-            // 메인 캐릭터 배치 주변부 레이아웃 유동 연산 배치
-            cell.style.left = (Math.random() * 84 + 8) + '%';
-            cell.style.top = (Math.random() * 65 + 15) + '%';
+            // 전 영역에 골고루 무작위 뿌리기
+            cell.style.left = (Math.random() * 80 + 10) + '%';
+            cell.style.top = (Math.random() * 60 + 20) + '%';
             cell.innerHTML = "✨";
-            cell.style.fontSize = (size * 0.45) + "px";
+            cell.style.fontSize = (size * 0.4) + "px";
 
-            const colorPalettes = ['#34e7e4', '#00d2d3', '#54a0ff', '#2e86de', '#48dbfb'];
+            const colorPalettes = ['#1abc9c', '#00d2d3', '#3498db', '#2e86de', '#54a0ff'];
             const chosenColor = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
             cell.style.backgroundColor = chosenColor;
-            cell.style.boxShadow = `0 4px 10px rgba(0,0,0,0.1), 0 0 10px ${chosenColor}`;
+            cell.style.boxShadow = `0 4px 14px rgba(0,0,0,0.15), 0 0 10px ${chosenColor}`;
 
             let isDragging = false;
-            let startX = 0, startY = 0;
+            let offsetX = 0, offsetY = 0;
 
             const onDragStart = (e) => {
                 isDragging = true;
-                cell.style.transform = 'scale(1.25)';
-                cell.style.opacity = '1.0';
+                cell.style.zIndex = "9999";
                 
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+                const pageY = e.touches ? e.touches[0].pageY : e.pageY;
                 
-                startX = clientX - cell.getBoundingClientRect().left;
-                startY = clientY - cell.getBoundingClientRect().top;
+                offsetX = pageX - cell.offsetLeft;
+                offsetY = pageY - cell.offsetTop;
                 
                 if(e.cancelable) e.preventDefault();
             };
 
             const onDragMove = (e) => {
                 if (!isDragging) return;
-                const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-                const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+                const pageX = e.touches ? e.touches[0].pageX : e.pageX;
+                const pageY = e.touches ? e.touches[0].pageY : e.pageY;
                 
-                cell.style.left = (clientX - startX) + 'px';
-                cell.style.top = (clientY - startY) + 'px';
+                cell.style.left = (pageX - offsetX) + 'px';
+                cell.style.top = (pageY - offsetY) + 'px';
 
                 checkMotiMouthOpen(cell);
             };
@@ -660,15 +627,19 @@
             const onDragEnd = () => {
                 if (!isDragging) return;
                 isDragging = false;
-                cell.style.transform = '';
-                cell.style.opacity = ''; 
 
                 if (checkEatSuccess(cell)) {
                     triggerMotiEatEffect();
                     cell.remove(); 
-                    setTimeout(() => { makeSingleFeedCell(parentContainer); }, 2000);
+                    setTimeout(() => { 
+                        const activePage = document.querySelector('.page.active');
+                        if(activePage && activePage.id === 'page-home') {
+                            makeSingleFeedCell(parentContainer); 
+                        }
+                    }, 2000);
                 } else {
                     document.getElementById('main-moti').classList.remove('eating');
+                    cell.style.zIndex = "";
                 }
             };
 
@@ -681,11 +652,13 @@
             document.addEventListener('touchend', onDragEnd);
         }
 
+        // ⭐️ [물리 연산 보정] 브라우저 화면 절대 위치값 기준 거리 계산으로 변경 
         function checkMotiMouthOpen(cellEl) {
             const moti = document.getElementById('main-moti');
             if(!moti) return;
             const motiRect = moti.getBoundingClientRect();
             const cellRect = cellEl.getBoundingClientRect();
+            
             const mX = motiRect.left + (motiRect.width / 2);
             const mY = motiRect.top + (motiRect.height / 2);
             const cX = cellRect.left + (cellRect.width / 2);
@@ -700,10 +673,12 @@
             if(!moti) return false;
             const motiRect = moti.getBoundingClientRect();
             const cellRect = cellEl.getBoundingClientRect();
+            
             const mX = motiRect.left + (motiRect.width / 2);
             const mY = motiRect.top + (motiRect.height / 2);
             const cX = cellRect.left + (cellRect.width / 2);
             const cY = cellRect.top + (cellRect.height / 2);
+            
             return (Math.hypot(mX - cX, mY - cY) < 110);
         }
 
@@ -787,7 +762,6 @@
             if (pageId === 'calendar') renderCalendar();
             if (pageId === 'profile') renderProfile();
             
-            // 페이지 전환마다 배경 먹이 세포 가시성 제어 적용
             createAmbientCells();
         }
 
@@ -798,7 +772,7 @@
             setTimeout(() => toast.classList.remove('show'), 2500);
         }
 
-        function initCharCounter() {
+        initCharCounter = () => {
             const textarea = document.getElementById('memory-input');
             const counter = document.getElementById('char-count');
             textarea.addEventListener('input', () => { counter.innerText = textarea.value.length; });
@@ -836,7 +810,6 @@
                 const y = Math.random() * (dish.clientHeight - size - 40) + 20;
                 node.style.left = x + 'px'; node.style.top = y + 'px';
                 node.addEventListener('click', () => {
-                    // 단일 세포 구체창 호출 시 포맷 정리
                     openModal({ date: mem.date, content: `기억 1: ${mem.content}` });
                 });
                 dish.appendChild(node);
@@ -886,7 +859,7 @@
                     const dot = document.createElement('span'); dot.className = 'cell-moti-dot'; icon.appendChild(dot);
                     cell.appendChild(icon);
                     
-                    // ⭐️ [복구 핵심] 캘린더 날짜 클릭 시 기억 1, 기억 2 포맷으로 묶어서 모달 출력하도록 스크립트 전면 정비
+                    // ⭐️ [캘린더 리스트 데이터 포맷 완전 보존]
                     cell.onclick = () => {
                         let combinedContent = dayMemories.map((m, index) => `기억 ${index + 1}: ${m.content}`).join('\n\n');
                         openModal({ date: dateStr, content: combinedContent });
