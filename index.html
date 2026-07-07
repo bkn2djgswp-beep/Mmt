@@ -11,8 +11,8 @@
         :root {
             --brand-main: #7E6CF9;
             --brand-sub: #B9A7FF;
-            --mint: #A7E7D7;
-            --sky: #CDE8FF;
+            --mint: #1abc9c;
+            --sky: #3498db;
             --white: #FFFFFF;
             --bg-dark: #667085;
             --bg-light: #F8F9FA;
@@ -68,7 +68,7 @@
 
         .logo .logo-dot {
             width: 12px; height: 12px;
-            background: var(--mint);
+            background: #1abc9c;
             border-radius: 50%;
             display: inline-block;
             animation: pulse 2s infinite;
@@ -197,7 +197,7 @@
             font-size: 17px; color: #666; line-height: 1.6; max-width: 600px; margin-bottom: 40px;
         }
         
-        /* 메인 캐릭터 영역 및 상호작용 애니메이션 */
+        /* 메인 캐릭터 영역 */
         .moti-container { position: relative; width: 220px; height: 220px; margin-bottom: 30px; z-index: 20; }
         .moti {
             width: 100%; height: 100%;
@@ -212,22 +212,15 @@
         }
         .moti:active { cursor: grabbing; }
         
-        /* 효과 클래스 */
-        .moti.spread-effect {
-            animation: spreadBlast 0.6s ease-out forwards !important;
-        }
-        .moti.eat-effect {
-            animation: eatBump 0.4s ease-out forwards !important;
-        }
+        .moti.spread-effect { animation: spreadBlast 0.6s ease-out forwards !important; }
+        .moti.eat-effect { animation: eatBump 0.4s ease-out forwards !important; }
 
         .moti-face { width: 80px; height: 40px; position: relative; display: flex; justify-content: space-between; align-items: center; pointer-events: none; }
         .moti-eye { width: 16px; height: 16px; background: #222; border-radius: 50%; position: relative; }
         .moti-eye::after { content: ''; position: absolute; top: 3px; left: 3px; width: 5px; height: 5px; background: white; border-radius: 50%; }
         .moti-mouth { width: 14px; height: 8px; border-bottom: 3px solid #222; border-radius: 0 0 10px 10px; position: absolute; bottom: 5px; left: 33px; transition: all 0.2s; }
         
-        .moti.eating .moti-mouth {
-            width: 16px; height: 16px; border: 3px solid #222; border-radius: 50%; bottom: 1px; background: #222;
-        }
+        .moti.eating .moti-mouth { width: 16px; height: 16px; border: 3px solid #222; border-radius: 50%; bottom: 1px; background: #222; }
 
         .moti-blush { width: 12px; height: 8px; background: rgba(255, 100, 150, 0.4); border-radius: 50%; position: absolute; bottom: 8px; }
         .moti-blush.left { left: -6px; }
@@ -242,33 +235,28 @@
             pointer-events: auto; 
         }
 
-        /* ⭐️ [수정] 먹이 세포 투명도 40% 적용 및 색상 시각화 개선 */
+        /* ⭐️ [방법 구현 핵심] 확실히 보이도록 불투명도 향상, 흰색 굵은 외곽선 및 네온 빛 테두리 추가 */
         .bg-cell { 
             position: absolute; 
             border-radius: 50%; 
-            opacity: 0.4; /* 캐릭터 대비 40% 투명도 적용 */
-            backdrop-filter: blur(2px); -webkit-backdrop-filter: blur(2px);
-            border: 2px solid rgba(255,255,255,0.7); 
+            opacity: 0.55; /* 확실히 인식되도록 40%에서 55%로 보정 업그레이드 */
+            backdrop-filter: blur(1px); -webkit-backdrop-filter: blur(1px);
+            border: 2.5px solid #ffffff; /* 흰색 테두리를 더 굵게 지정해 형태를 확실히 마킹 */
             cursor: grab;
             pointer-events: auto;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.08);
+            /* 셀 고유 색상에 맞춘 발광(Glow) 효과를 주어 배경에서 무조건 보정 분리함 */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12), 0 0 8px rgba(255, 255, 255, 0.6); 
             display: flex; justify-content: center; align-items: center;
             user-select: none;
             z-index: 6;
             touch-action: none;
-            transition: transform 0.2s, opacity 0.2s;
+            transition: transform 0.2s, opacity 0.2s, box-shadow 0.2s;
         }
-        .bg-cell:active { cursor: grabbing; z-index: 999; opacity: 0.8; transform: scale(1.15); }
+        .bg-cell:active { cursor: grabbing; z-index: 999; opacity: 0.95; transform: scale(1.2); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
         
-        /* 밥 주기 가이드 문구 스타일 */
         .feed-guide-text {
-            font-size: 14px;
-            color: #7d849a;
-            font-weight: 600;
-            margin-top: 35px;
-            letter-spacing: 0.3px;
-            user-select: none;
-            animation: pulseText 2s infinite ease-in-out;
+            font-size: 14px; color: #7d849a; font-weight: 600; margin-top: 35px;
+            letter-spacing: 0.3px; user-select: none; animation: pulseText 2s infinite ease-in-out;
         }
 
         /* --- WRITE PAGE --- */
@@ -353,7 +341,7 @@
         .day-cell:not(.empty) { cursor: pointer; }
         .day-cell:not(.empty):hover { background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
         .day-num { font-size: 13px; font-weight: 600; color: #555; }
-        .day-cell.today { border: 2px solid var(--mint); background: rgba(167, 231, 215, 0.15); }
+        .day-cell.today { border: 2px solid #1abc9c; background: rgba(167, 231, 215, 0.15); }
         .day-cell.today .day-num { color: #1abc9c; font-weight: 800; }
         .cell-icons { display: flex; gap: 2px; flex-wrap: wrap; width: 100%; }
         .cell-moti-dot { width: 14px; height: 14px; background: var(--brand-sub); border-radius: 50%; display: inline-block; animation: pulse 2s infinite; }
@@ -417,7 +405,6 @@
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(185, 167, 255, 0.4); } 70% { box-shadow: 0 0 0 8px rgba(185, 167, 255, 0); } 100% { box-shadow: 0 0 0 0 rgba(185, 167, 255, 0); } }
         @keyframes pulseText { 0%, 100% { opacity: 0.5; } 50% { opacity: 1; } }
         
-        /* 꾹 눌렀을 때 젤리 퍼짐 효과 */
         @keyframes spreadBlast {
             0% { transform: scale(1); border-radius: 50%; }
             25% { transform: scale(1.4, 0.65); border-radius: 38% 62% 35% 65% / 45% 45% 55% 55%; }
@@ -426,7 +413,6 @@
             100% { transform: scale(1); border-radius: 50%; }
         }
         
-        /* 밥 먹었을 때 움찔 커지는 리액션 */
         @keyframes eatBump {
             0% { transform: scale(1); }
             35% { transform: scale(1.3); box-shadow: 0 25px 50px rgba(167, 231, 215, 0.6); }
@@ -473,7 +459,7 @@
                 </div>
                 <div><button class="btn-primary" onclick="navigateTo('write')">오늘의 기억 기록하기 <i class="fa-solid fa-arrow-right"></i></button></div>
                 
-                <p class="feed-guide-text"><i class="fa-solid fa-hand-pointer"></i> 캐릭터를 꾹 누르거나, 배경의 연한 세포를 드래그해서 먹여보세요!</p>
+                <p class="feed-guide-text"><i class="fa-solid fa-hand-pointer"></i> 캐릭터를 꾹 누르거나, 배경의 세포를 드래그해서 먹여보세요!</p>
             </div>
             
             <div class="ambient-cells" id="ambient-cells-container"></div>
@@ -603,7 +589,6 @@
             document.getElementById('auth-modal').addEventListener('click', function(e) { if(e.target === this) closeAuthModal(); });
         });
 
-        // 1. 캐릭터 꾹 누르기 판정
         function startMotiPress(e) {
             const moti = document.getElementById('main-moti');
             if(!moti) return;
@@ -626,7 +611,7 @@
             if(moti) { moti.style.transform = ""; }
         }
 
-        // 2. 배경 세포 생성 및 드래그 앤 드롭 밥 주기 기능
+        // 2. 배경 세포 생성 스크립트 수정 및 예외 문자열 전면 디버깅 완료
         function createAmbientCells() {
             const container = document.getElementById('ambient-cells-container');
             if(!container) return;
@@ -642,7 +627,7 @@
             const cell = document.createElement('div');
             cell.className = 'bg-cell';
             
-            const size = Math.random() * 25 + 30; 
+            const size = Math.random() * 25 + 32; 
             cell.style.width = size + 'px';
             cell.style.height = size + 'px';
             
@@ -651,24 +636,27 @@
             cell.innerHTML = "✨";
             cell.style.fontSize = (size * 0.45) + "px";
 
-            // ⭐️ [수정] 민트, 하늘, 푸른색 계열 40% 투명도 컬러셋 무작위 바인딩
+            // ⭐️ [방법 구현 구현부] 파스텔 불투명 배경에 묻히지 않도록 선명한 솔리드(Solid) 계열 컬러세트로 전환
             const colorPalettes = [
-                'rgba(167, 231, 215, 1)',  /* 민트 */
-                'resolve-sky',
-                'rgba(205, 232, 255, 1)',  /* 하늘 */
-                'rgba(135, 206, 250, 1)',  /* 연파랑 */
-                'rgba(173, 216, 230, 1)'   /* 푸른색 */
+                '#34e7e4', /* 리얼 민트 청록 */
+                '#00d2d3', /* 네온 민트 */
+                '#54a0ff', /* 비비드 스카이 블루 */
+                '#2e86de', /* 선명한 푸른색 */
+                '#48dbfb'  /* 맑은 하늘색 */
             ];
             const chosenColor = colorPalettes[Math.floor(Math.random() * colorPalettes.length)];
             cell.style.backgroundColor = chosenColor;
+            
+            // 박스 섀도우에도 고유 색상 glow를 직접 입혀 시각 인지성 폭발 향상
+            cell.style.boxShadow = `0 4px 10px rgba(0,0,0,0.1), 0 0 10px ${chosenColor}`;
 
             let isDragging = false;
             let startX = 0, startY = 0;
 
             const onDragStart = (e) => {
                 isDragging = true;
-                cell.style.transform = 'scale(1.2)';
-                cell.style.opacity = '0.9'; // 드래그 시 선명하게 변경
+                cell.style.transform = 'scale(1.22)';
+                cell.style.opacity = '1.0';
                 
                 const clientX = e.touches ? e.touches[0].clientX : e.clientX;
                 const clientY = e.touches ? e.touches[0].clientY : e.clientY;
@@ -699,7 +687,7 @@
                 if (!isDragging) return;
                 isDragging = false;
                 cell.style.transform = '';
-                cell.style.opacity = '0.4'; // 원래 투명도 40%로 복귀
+                cell.style.opacity = ''; // CSS의 기본 불투명도 스케일(0.55)로 복원됨
 
                 if (checkEatSuccess(cell)) {
                     triggerMotiEatEffect();
@@ -752,11 +740,10 @@
             moti.classList.remove('eating', 'spread-effect');
             void moti.offsetWidth; 
             moti.classList.add('eat-effect');
-            showToast('냠냠! 연한 세포 먹이를 주어 에너지를 가득 흡수했습니다! 🔋');
+            showToast('냠냠! 세포 먹이를 주어 캐릭터가 에너지를 가득 흡수했습니다! 🔋');
             setTimeout(() => { moti.classList.remove('eat-effect'); }, 400);
         }
 
-        /* [기존 데이터 보관 관리 시스템 스크립트 그대로 유지] */
         function loadUserData() {
             if (!currentUser) { memories = []; targetGoal = 20; } 
             else {
